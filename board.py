@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 
 # 棋盘类
@@ -15,12 +16,12 @@ class Board(object):
     def add(self):
         """随机添加一个新数字"""
         pos = random.randint(0, 15)
-        while self.map[pos // 4][pos % 4] != 0:
-            pos = random.randint(1, 16)
+        while self.map[math.floor(pos // 4)][pos % 4] != 0:
+            pos = random.randint(0, 15)
         num = random.randint(0, 99)
-        num = (lambda x: 4 if x >= 90 else 2)(num) # 十分之一的概率为4
-        print(num)
-        self.map[pos // 4][pos % 4] = num
+        num = (lambda x: 4 if x >= 90 else 2)(num)  # 十分之一的概率为4
+        print(pos)
+        self.map[math.floor(pos // 4)][pos % 4] = num
 
     def move_left(self):
         for i in range(4):

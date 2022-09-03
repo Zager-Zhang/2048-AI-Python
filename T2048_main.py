@@ -10,9 +10,9 @@ class T2048Game(object):
         pygame.init()
 
         # 屏幕相关
-        self.Fullscreen = 0
+        # self.Fullscreen = 0
         self.screen = pygame.display.set_mode(SCREEN_RECT.size, 0, 32)
-        pygame.display.set_caption("2048——by ZAGER")
+        pygame.display.set_caption("2048——by Zager Tracy")
 
         # 字体相关
         self.font_ZH = pygame.font.SysFont("SimHei", 50)

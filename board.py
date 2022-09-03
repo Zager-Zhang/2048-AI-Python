@@ -8,20 +8,35 @@ class Board(object):
 
     def __init__(self):
         self.map = [[0 for i in range(4)] for j in range(4)]
+        self.score = 0
         # 开局先加入两个数
         self.add()
         self.add()
         self.print_map()
 
+    def __judge_board(self):
+        """判断当前是否可以添加数"""
+
+        for i in range(4):
+            for j in range(4):
+                if self.map[i][j] == 0:
+                    return True
+        return False
+
     def add(self):
         """随机添加一个新数字"""
+
+        if not self.__judge_board():
+            print("游戏无法继续，请重新操作或者重开游戏")
+            return False
         pos = random.randint(0, 15)
         while self.map[math.floor(pos // 4)][pos % 4] != 0:
             pos = random.randint(0, 15)
         num = random.randint(0, 99)
         num = (lambda x: 4 if x >= 90 else 2)(num)  # 十分之一的概率为4
-        print(pos)
+        # print(pos)
         self.map[math.floor(pos // 4)][pos % 4] = num
+        return True
 
     def move_left(self):
         for i in range(4):
@@ -30,11 +45,13 @@ class Board(object):
             row = sorted(row, key=lambda x: 1 if x == 0 else 0)
             for j in range(3):
                 if row[j] == row[j + 1]:
+                    self.score += row[j] * 2
                     row[j] += row[j + 1]
                     row[j + 1] = 0
             # 再次更新每一行的0
             row = sorted(row, key=lambda x: 1 if x == 0 else 0)
             self.map[i] = row
+        print("score:%d" % self.score)
 
     def move_right(self):
         self.map = [row[::-1] for row in self.map]

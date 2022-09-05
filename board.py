@@ -1,20 +1,30 @@
-import pygame
+import copy
 import random
 import math
+from T2048_defines import *
+
+# 方块的位置权值
+map_w = [[64, 64, 32, 32],
+         [64, 64, 32, 32],
+         [32, 32, 16, 16],
+         [32, 32, 16, 16]]
 
 
-# 棋盘类
 class Board(object):
+    """棋盘类"""
 
     def __init__(self):
-        self.map = [[0 for i in range(4)] for j in range(4)]
+        """棋盘初始化"""
+        self.map = [[0 for _ in range(4)] for _ in range(4)]
         self.score = 0
+        self.best_direction = None
+
         # 开局先加入两个数
         self.add()
         self.add()
         self.print_map()
 
-    def __judge_board(self):
+    def __judge_add(self):
         """判断当前是否可以添加数"""
 
         for i in range(4):
@@ -23,11 +33,33 @@ class Board(object):
                     return True
         return False
 
-    def add(self):
-        """随机添加一个新数字"""
+    def __judge_game(self):
+        """判断游戏是否可以继续"""
 
-        if not self.__judge_board():
-            print("游戏无法继续，请重新操作或者重开游戏")
+        for i in range(4):
+            for j in range(4):
+                if self.map[i][j] == 0:
+                    return True
+                elif j + 1 <= 3 and self.map[i][j] == self.map[i][j + 1]:
+                    return True
+                elif j - 1 >= 0 and self.map[i][j] == self.map[i][j - 1]:
+                    return True
+                elif i + 1 <= 3 and self.map[i][j] == self.map[i + 1][j]:
+                    return True
+                elif i - 1 >= 0 and self.map[i][j] == self.map[i - 1][j]:
+                    return True
+        return False
+
+    def add(self):
+        """
+        随机添加一个新数字
+        :return: True 可以继续游戏 False 操作错误无法继续游戏
+        """
+        if not self.__judge_game():
+            print("Game Over!")
+            return False
+        if not self.__judge_add():
+            print("操作失误，请重新操作")
             return False
         pos = random.randint(0, 15)
         while self.map[math.floor(pos // 4)][pos % 4] != 0:
@@ -38,50 +70,87 @@ class Board(object):
         self.map[math.floor(pos // 4)][pos % 4] = num
         return True
 
-    def move_left(self):
+    @staticmethod
+    def calculate_predictions(mapp):
+        """计算未来一步的预测评分值"""
+
+        tmp = 0
         for i in range(4):
-            row = self.map[i]
+            for j in range(4):
+                if j + 1 <= 3 and mapp[i][j] == mapp[i][j + 1]:
+                    tmp += mapp[i][j]
+                elif j - 1 >= 0 and mapp[i][j] == mapp[i][j - 1]:
+                    tmp += mapp[i][j]
+                elif i + 1 <= 3 and mapp[i][j] == mapp[i + 1][j]:
+                    tmp += mapp[i][j]
+                elif i - 1 >= 0 and mapp[i][j] == mapp[i - 1][j]:
+                    tmp += mapp[i][j]
+        return tmp
+
+    @staticmethod
+    def calculate_map_w(mapp):
+        """计算当前方块权值"""
+
+        tmp = 0
+        for i in range(4):
+            for j in range(4):
+                tmp += mapp[i][j] * map_w[i][j]
+        return tmp
+
+    def move_left(self, is_change=True):
+        """
+        左移 并 计算评分
+        :param is_change: 是否对当前情况进行修改
+        :return: 不修改 :当前情况的评分值 用来提供AI的判断标准
+                 修改   :返回 0
+        """
+        single_score = 0
+        single_cnt = 0
+        tmp_map = copy.deepcopy(self.map)
+        for i in range(4):
+            row = tmp_map[i]
             # 将每一行的0都移到后面
             row = sorted(row, key=lambda x: 1 if x == 0 else 0)
             for j in range(3):
                 if row[j] == row[j + 1]:
-                    self.score += row[j] * 2
+                    single_score += row[j] * 2
+                    single_cnt += 1
                     row[j] += row[j + 1]
                     row[j + 1] = 0
             # 再次更新每一行的0
             row = sorted(row, key=lambda x: 1 if x == 0 else 0)
-            self.map[i] = row
-        print("score:%d" % self.score)
+            tmp_map[i] = row
 
-    def move_right(self):
+        prediction_score = self.calculate_predictions(tmp_map)
+        if is_change:
+            self.map = copy.deepcopy(tmp_map)
+            self.score += single_score
+            return 0
+        else:
+            return single_score + single_cnt * single_score + prediction_score * 0.8
+
+    def move_right(self, is_change=True):
         self.map = [row[::-1] for row in self.map]
-        self.move_left()
+        temp = self.move_left(is_change)
         self.map = [row[::-1] for row in self.map]
+        return temp
 
-    def move_up(self):
-        # 左旋90°
+    def move_up(self, is_change=True):
+        # 左旋90° 再 右旋90°
         self.map_left_rotate90()
-        # self.print_map()
-
-        self.move_left()
-
-        # 右旋90°
+        temp = self.move_left(is_change)
         self.map_right_rotate90()
-        # self.print_map()
+        return temp
 
-    def move_down(self):
-        # 左旋90°
+    def move_down(self, is_change=True):
+        # 右旋90° 再 左旋90°
         self.map_right_rotate90()
-        # self.print_map()
-
-        self.move_left()
-
-        # 右旋90°
+        temp = self.move_left(is_change)
         self.map_left_rotate90()
-        # self.print_map()
+        return temp
 
     def print_map(self):
-        print("hhh:")
+        print("当前局势为:")
         for i in range(4):
             print(self.map[i])
 
@@ -91,14 +160,61 @@ class Board(object):
         for i in range(4):
             for j in range(4):
                 temp_map[i][j] = self.map[j][3 - i]
-        self.map = temp_map
+        self.map = copy.deepcopy(temp_map)
 
     def map_right_rotate90(self):
+        """ 右旋转90° """
         temp_map = [[0 for i in range(4)] for j in range(4)]
         for i in range(4):
             for j in range(4):
                 temp_map[i][j] = self.map[3 - j][i]
-        self.map = temp_map
+        self.map = copy.deepcopy(temp_map)
+
+    def tip_direction(self):
+        """提示操作方向"""
+
+        prediction = [0, 0, 0, 0]
+        tip = {0: 'left', 1: 'right', 2: 'up', 3: 'down'}
+        prediction[0] = self.move_left(False)
+        prediction[1] = self.move_right(False)
+        prediction[2] = self.move_up(False)
+        prediction[3] = self.move_down(False)
+        self.best_direction = prediction.index(max(prediction))
+        print(tip[self.best_direction])
+        return self.best_direction
+
+    def update(self, surface):
+
+        # 棋盘板的颜色
+        surface.fill(BOARD_COLOR, rect=BOARD_RECD)
+
+        # 棋盘格颜色
+        for i in range(4):
+            for j in range(4):
+                surface.fill(BOARD_PLAID_COLOR,
+                             rect=(BOARD_RECD.x + SIDE_WIDTH * (j + 1) + CUBE_WIDTH * j,
+                                   BOARD_RECD.y + SIDE_WIDTH * (i + 1) + CUBE_WIDTH * i, CUBE_WIDTH, CUBE_WIDTH))
+        for i in range(4):
+            for j in range(4):
+                if self.map[i][j]:
+                    cube_rect = pygame.Rect(BOARD_RECD.x + SIDE_WIDTH * (j + 1) + CUBE_WIDTH * j,
+                            BOARD_RECD.y + SIDE_WIDTH * (i + 1) + CUBE_WIDTH * i, CUBE_WIDTH, CUBE_WIDTH)
+                    surface.fill(CUBE_COLORS[int(math.log2(self.map[i][j]))], rect=cube_rect)
+
+                    if self.map[i][j] <= 4:
+                        font = pygame.font.SysFont("Microsoft Sans Serif", 50)
+                        text = font.render(str(self.map[i][j]), True, CUBE_NUM_COLORS[0])
+                    elif self.map[i][j] <= 64:
+                        font = pygame.font.SysFont("Microsoft Sans Serif", 45)
+                        text = font.render(str(self.map[i][j]), True, CUBE_NUM_COLORS[1])
+                    elif self.map[i][j] <= 512:
+                        font = pygame.font.SysFont("Microsoft Sans Serif", 40)
+                        text = font.render(str(self.map[i][j]), True, CUBE_NUM_COLORS[1])
+                    else:
+                        font = pygame.font.SysFont("Microsoft Sans Serif", 35)
+                        text = font.render(str(self.map[i][j]), True, CUBE_NUM_COLORS[1])
+                    font_rect = text.get_rect(center=cube_rect.center)
+                    surface.blit(text, font_rect)
 
 # B = Board()
 # T = 3

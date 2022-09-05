@@ -1,4 +1,4 @@
-import pygame
+from T2048_defines import *
 
 BUTTON_START = 1
 BUTTON_QUIT = 2
@@ -23,7 +23,7 @@ class Button(object):
         self.font = pygame.font.SysFont(font, text_size)
         self.text_color = text_color
         self.text_size = text_size
-        self.text = self.font.render(text, True, self.text_color)
+        self.text = self.font.render(text, True, CUBE_NUM_COLORS[0])
         self.func = func
 
         # 按钮的状态
@@ -47,5 +47,6 @@ class Button(object):
         """绘制按钮的文本和方框"""
 
         text_rect = self.text.get_rect(center=self.rect.center)
+        pygame.draw.rect(surface, self.rect_color, self.rect, 3, 10)
         surface.fill(self.rect_color, rect=self.rect)
         surface.blit(self.text, text_rect)

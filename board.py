@@ -174,10 +174,10 @@ class Board(object):
         """提示操作方向"""
 
         prediction = [0, 0, 0, 0]
-        tip = {0: 'left', 1: 'right', 2: 'up', 3: 'down'}
+        tip = {0: 'left', 1: 'up', 2: 'right', 3: 'down'}
         prediction[0] = self.move_left(False)
-        prediction[1] = self.move_right(False)
-        prediction[2] = self.move_up(False)
+        prediction[1] = self.move_up(False)
+        prediction[2] = self.move_right(False)
         prediction[3] = self.move_down(False)
         self.best_direction = prediction.index(max(prediction))
         print(tip[self.best_direction])

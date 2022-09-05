@@ -1,7 +1,9 @@
 from T2048_defines import *
 
 BUTTON_START = 1
-BUTTON_QUIT = 2
+BUTTON_CLASSIC = 2
+BUTTON_AUTO = 3
+BUTTON_TIP = 4
 
 
 class Button(object):

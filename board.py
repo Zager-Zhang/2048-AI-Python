@@ -3,11 +3,16 @@ import random
 import math
 from T2048_defines import *
 
+GAME_CONTINUE = 1
+GAME_ERROR = 0
+GAME_OVER = -1
 # 方块的位置权值
 map_w = [[64, 64, 32, 32],
          [64, 64, 32, 32],
          [32, 32, 16, 16],
          [32, 32, 16, 16]]
+
+tip = {0: 'left', 1: 'up', 2: 'right', 3: 'down'}
 
 
 class Board(object):
@@ -57,10 +62,10 @@ class Board(object):
         """
         if not self.__judge_game():
             print("Game Over!")
-            return False
+            return GAME_OVER
         if not self.__judge_add():
             print("操作失误，请重新操作")
-            return False
+            return GAME_ERROR
         pos = random.randint(0, 15)
         while self.map[math.floor(pos // 4)][pos % 4] != 0:
             pos = random.randint(0, 15)
@@ -68,7 +73,7 @@ class Board(object):
         num = (lambda x: 4 if x >= 90 else 2)(num)  # 十分之一的概率为4
         # print(pos)
         self.map[math.floor(pos // 4)][pos % 4] = num
-        return True
+        return GAME_CONTINUE
 
     @staticmethod
     def calculate_predictions(mapp):
@@ -174,16 +179,15 @@ class Board(object):
         """提示操作方向"""
 
         prediction = [0, 0, 0, 0]
-        tip = {0: 'left', 1: 'up', 2: 'right', 3: 'down'}
         prediction[0] = self.move_left(False)
         prediction[1] = self.move_up(False)
         prediction[2] = self.move_right(False)
         prediction[3] = self.move_down(False)
         self.best_direction = prediction.index(max(prediction))
-        print(tip[self.best_direction])
+        # print(tip[self.best_direction])
         return self.best_direction
 
-    def update(self, surface):
+    def update(self, surface, is_tip):
 
         # 棋盘板的颜色
         surface.fill(BOARD_COLOR, rect=BOARD_RECD)
@@ -198,7 +202,8 @@ class Board(object):
             for j in range(4):
                 if self.map[i][j]:
                     cube_rect = pygame.Rect(BOARD_RECD.x + SIDE_WIDTH * (j + 1) + CUBE_WIDTH * j,
-                            BOARD_RECD.y + SIDE_WIDTH * (i + 1) + CUBE_WIDTH * i, CUBE_WIDTH, CUBE_WIDTH)
+                                            BOARD_RECD.y + SIDE_WIDTH * (i + 1) + CUBE_WIDTH * i, CUBE_WIDTH,
+                                            CUBE_WIDTH)
                     surface.fill(CUBE_COLORS[int(math.log2(self.map[i][j]))], rect=cube_rect)
 
                     if self.map[i][j] <= 4:
@@ -216,11 +221,9 @@ class Board(object):
                     font_rect = text.get_rect(center=cube_rect.center)
                     surface.blit(text, font_rect)
 
-# B = Board()
-# T = 3
-# while T:
-#     T -= 1
-#     B.move_up()
-#     B.print_map()
-#     B.add()
-#     B.print_map()
+        if is_tip:
+            font = pygame.font.SysFont("consolas", 36)
+            text = font.render('tip:' + tip[self.tip_direction()], True, (100, 100, 10))
+            font_rect = text.get_rect(center=(225, 406))
+            surface.blit(text, font_rect)
+

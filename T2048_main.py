@@ -10,10 +10,9 @@ class T2048Game(object):
         pygame.init()
 
         # 屏幕相关
-        # self.Fullscreen = 0
         self.screen = pygame.display.set_mode(SCREEN_RECT.size, 0, 32)
         self.screen.fill((255, 250, 240), rect=SCREEN_RECT)
-        pygame.display.set_caption("2048——by Zager Tracy")
+        pygame.display.set_caption("2048——by 张明杰 鄢歆璐 明宏泽 林政")
 
         # 字体相关
         self.font_EN = pygame.font.SysFont("comicsansms", 75)
@@ -60,16 +59,18 @@ class T2048Game(object):
             self.time.tick(FRAME_PER_SEC)
             self.__event_handler()
             self.__button_handler()
-            self.board.update(self.screen)
+            self.board.update(self.screen, self.flag_tip)
             pygame.display.update()
 
     def __event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.__game_over()
+            # 处理键盘事件
             elif event.type == pygame.KEYDOWN:
                 if self.button_classic:
                     self.__keyboard_handler(event.key)
+            # 处理按钮事件
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.button_start.check_event()
                 self.__button_func_handler(self.button_start.func_handler())
@@ -80,31 +81,8 @@ class T2048Game(object):
                 self.button_tip.check_event()
                 self.__button_func_handler(self.button_tip.func_handler())
 
-    def AI_start(self):
-        best_direction = self.board.tip_direction()
-        if best_direction == 0:
-            self.board.move_left()
-        elif best_direction == 1:
-            self.board.move_up()
-        elif best_direction == 2:
-            self.board.move_right()
-        elif best_direction == 3:
-            self.board.move_down()
-
-        print(" score:%d\n best_score:%d" % (self.board.score, self.best_score))
-        if not self.board.add():
-            self.best_score = max(self.best_score, self.board.score)
-
-            font_end = pygame.font.SysFont("comicsansms", 60)
-            text_end = font_end.render("Game Over!", True, (50, 50, 50))
-            self.screen.blit(text_end, (60, 300))
-            pygame.display.update()
-
-            time.sleep(3)
-            self.board = Board()
-        self.board.print_map()
-
     def __button_handler(self):
+        """按钮处理"""
         if self.flag_start:
             self.flag_start = False
             print("新的游戏开始了...")
@@ -130,21 +108,24 @@ class T2048Game(object):
         else:
             return None
 
-        self.board.add()
+        if self.board.add() == GAME_OVER:
+            font_end = pygame.font.SysFont("comicsansms", 60)
+            text_end = font_end.render("Game Over!", True, (50, 50, 50))
+            self.screen.blit(text_end, (60, 350))
+            pygame.display.update()
+
+            time.sleep(3)
+            self.board = Board()
         self.board.print_map()
         self.board.tip_direction()
-        # elif key == pygame.K_f:
-        #     self.Fullscreen = not self.Fullscreen
-        #     if self.Fullscreen:
-        #         self.screen = pygame.display.set_mode(SCREEN_RECT.size, pygame.FULLSCREEN, 32)
-        #     else:
-        #         self.screen = pygame.display.set_mode(SCREEN_RECT.size, 0, 32)
 
     def __button_func_handler(self, button_func):
         """处理按钮功能"""
 
         if button_func == BUTTON_START:
             self.flag_start = True
+            self.flag_classic = True
+            self.flag_auto = False
         elif button_func == BUTTON_CLASSIC:
             self.flag_classic = True
             self.flag_auto = False
@@ -152,7 +133,33 @@ class T2048Game(object):
             self.flag_auto = True
             self.flag_classic = False
         elif button_func == BUTTON_TIP:
-            self.flag_tip = True
+            if self.flag_tip:
+                self.flag_tip = False
+            else:
+                self.flag_tip = True
+
+    def AI_start(self):
+        best_direction = self.board.tip_direction()
+        if best_direction == 0:
+            self.board.move_left()
+        elif best_direction == 1:
+            self.board.move_up()
+        elif best_direction == 2:
+            self.board.move_right()
+        elif best_direction == 3:
+            self.board.move_down()
+
+        self.best_score = max(self.best_score, self.board.score)
+        print(" score:%d\n best_score:%d" % (self.board.score, self.best_score))
+        if self.board.add() == GAME_OVER:
+            font_end = pygame.font.SysFont("comicsansms", 60)
+            text_end = font_end.render("Game Over!", True, (50, 50, 50))
+            self.screen.blit(text_end, (60, 300))
+            pygame.display.update()
+
+            time.sleep(3)
+            self.board = Board()
+        self.board.print_map()
 
     @staticmethod
     def __game_over():

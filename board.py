@@ -1,17 +1,15 @@
 import copy
 import random
 import math
-from T2048_defines import *
+from config_2048 import *
 
 GAME_CONTINUE = 1
 GAME_ERROR = 0
 GAME_OVER = -1
 # 方块的位置权值
-map_w = [[64, 64, 32, 32],
-         [64, 64, 32, 32],
-         [32, 32, 16, 16],
-         [32, 32, 16, 16]]
 
+
+# tip的映射
 tip = {0: 'left', 1: 'up', 2: 'right', 3: 'down'}
 
 
@@ -24,9 +22,9 @@ class Board(object):
         self.score = 0
         self.best_direction = None
 
-        # 开局先加入两个数
-        self.add()
-        self.add()
+        # 开局先加入两个2
+        self.add(True)
+        self.add(True)
         self.print_map()
 
     def __judge_add(self):
@@ -55,7 +53,7 @@ class Board(object):
                     return True
         return False
 
-    def add(self):
+    def add(self, is_start=False):
         """
         随机添加一个新数字
         :return: True 可以继续游戏 False 操作错误无法继续游戏
@@ -71,7 +69,8 @@ class Board(object):
             pos = random.randint(0, 15)
         num = random.randint(0, 99)
         num = (lambda x: 4 if x >= 90 else 2)(num)  # 十分之一的概率为4
-        # print(pos)
+        if is_start:
+            num = 2
         self.map[math.floor(pos // 4)][pos % 4] = num
         return GAME_CONTINUE
 
@@ -226,4 +225,3 @@ class Board(object):
             text = font.render('tip:' + tip[self.tip_direction()], True, (100, 100, 10))
             font_rect = text.get_rect(center=(225, 406))
             surface.blit(text, font_rect)
-

@@ -1,4 +1,4 @@
-from T2048_defines import *
+from config_2048 import *
 
 BUTTON_START = 1
 BUTTON_CLASSIC = 2
@@ -8,7 +8,7 @@ BUTTON_TIP = 4
 
 class Button(object):
 
-    def __init__(self, rect, rect_color, font, text_color, text_size, text, func, **kwargs):
+    def __init__(self, rect, rect_color, font, text_color, text_size, text, func):
         """
         按键初始化
         :param rect:       按键大小和位置
@@ -18,7 +18,6 @@ class Button(object):
         :param text_size:  字体大小
         :param text:       按键上显示文本
         :param func:       功能
-        :param kwargs: 
         """
         self.rect = pygame.Rect(rect)
         self.rect_color = rect_color

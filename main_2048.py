@@ -3,7 +3,7 @@ from board import *
 import time
 
 
-class T2048Game(object):
+class Game2048(object):
 
     def __init__(self):
         print("2048游戏初始化...")
@@ -12,7 +12,7 @@ class T2048Game(object):
         # 屏幕相关
         self.screen = pygame.display.set_mode(SCREEN_RECT.size, 0, 32)
         self.screen.fill((255, 250, 240), rect=SCREEN_RECT)
-        pygame.display.set_caption("2048——by 张明杰 鄢歆璐 明宏泽 林政")
+        pygame.display.set_caption("2048——by 张明杰 鄢歆璐")
 
         # 字体相关
         self.font_EN = pygame.font.SysFont("comicsansms", 75)
@@ -83,6 +83,7 @@ class T2048Game(object):
 
     def __button_handler(self):
         """按钮处理"""
+
         if self.flag_start:
             self.flag_start = False
             print("新的游戏开始了...")
@@ -169,5 +170,5 @@ class T2048Game(object):
 
 
 if __name__ == '__main__':
-    game2048 = T2048Game()
+    game2048 = Game2048()
     game2048.game_start()

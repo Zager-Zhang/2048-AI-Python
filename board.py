@@ -2,6 +2,7 @@ import copy
 import random
 import math
 from config_2048 import *
+from calculator import *
 
 GAME_CONTINUE = 1
 GAME_ERROR = 0
@@ -37,7 +38,7 @@ class Board(object):
         return False
 
     def __judge_game(self):
-        """判断游戏是否可以继续"""
+        """判断游戏是否可以继续：是否有空方块或者有可以合并的"""
 
         for i in range(4):
             for j in range(4):
@@ -56,7 +57,7 @@ class Board(object):
     def add(self, is_start=False):
         """
         随机添加一个新数字
-        :return: True 可以继续游戏 False 操作错误无法继续游戏
+        :return: GAME_OVER GAME_ERROR GAME_CONTINUE
         """
         if not self.__judge_game():
             print("Game Over!")
@@ -74,32 +75,7 @@ class Board(object):
         self.map[math.floor(pos // 4)][pos % 4] = num
         return GAME_CONTINUE
 
-    @staticmethod
-    def calculate_predictions(mapp):
-        """计算未来一步的预测评分值"""
 
-        tmp = 0
-        for i in range(4):
-            for j in range(4):
-                if j + 1 <= 3 and mapp[i][j] == mapp[i][j + 1]:
-                    tmp += mapp[i][j]
-                elif j - 1 >= 0 and mapp[i][j] == mapp[i][j - 1]:
-                    tmp += mapp[i][j]
-                elif i + 1 <= 3 and mapp[i][j] == mapp[i + 1][j]:
-                    tmp += mapp[i][j]
-                elif i - 1 >= 0 and mapp[i][j] == mapp[i - 1][j]:
-                    tmp += mapp[i][j]
-        return tmp
-
-    @staticmethod
-    def calculate_map_w(mapp):
-        """计算当前方块权值"""
-
-        tmp = 0
-        for i in range(4):
-            for j in range(4):
-                tmp += mapp[i][j] * map_w[i][j]
-        return tmp
 
     def move_left(self, is_change=True):
         """
@@ -125,13 +101,14 @@ class Board(object):
             row = sorted(row, key=lambda x: 1 if x == 0 else 0)
             tmp_map[i] = row
 
-        prediction_score = self.calculate_predictions(tmp_map)
+        prediction_score = calculate_evaluation(tmp_map)
         if is_change:
             self.map = copy.deepcopy(tmp_map)
             self.score += single_score
             return 0
         else:
-            return single_score + single_cnt * single_score + prediction_score * 0.8
+            # return single_score + single_cnt * single_score + prediction_score * 0.8
+            return prediction_score
 
     def move_right(self, is_change=True):
         self.map = [row[::-1] for row in self.map]
@@ -187,6 +164,11 @@ class Board(object):
         return self.best_direction
 
     def update(self, surface, is_tip):
+        '''
+        :param surface:
+        :param is_tip:
+        :return:
+        '''
 
         # 棋盘板的颜色
         surface.fill(BOARD_COLOR, rect=BOARD_RECD)

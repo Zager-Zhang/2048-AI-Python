@@ -17,9 +17,12 @@ tip = {0: 'left', 1: 'up', 2: 'right', 3: 'down'}
 class Board(object):
     """棋盘类"""
 
-    def __init__(self):
+    def __init__(self, mapp=None):
         """棋盘初始化"""
-        self.map = [[0 for _ in range(4)] for _ in range(4)]
+        if mapp is None:
+            self.map = [[0 for _ in range(4)] for _ in range(4)]
+        else:
+            self.map = mapp
         self.score = 0
         self.best_direction = None
 
@@ -75,18 +78,16 @@ class Board(object):
         self.map[math.floor(pos // 4)][pos % 4] = num
         return GAME_CONTINUE
 
-
-
-    def move_left(self, is_change=True):
+    def move_left(self):
         """
-        左移 并 计算评分
-        :param is_change: 是否对当前情况进行修改
-        :return: 不修改 :当前情况的评分值 用来提供AI的判断标准
-                 修改   :返回 0
+        function: 棋盘左移
+        return: False不能左移 True可以左移
         """
+
         single_score = 0
-        single_cnt = 0
+        is_ok = False
         tmp_map = copy.deepcopy(self.map)
+        last_map = copy.deepcopy(self.map)      # 修改前的棋盘
         for i in range(4):
             row = tmp_map[i]
             # 将每一行的0都移到后面
@@ -94,46 +95,38 @@ class Board(object):
             for j in range(3):
                 if row[j] == row[j + 1]:
                     single_score += row[j] * 2
-                    single_cnt += 1
                     row[j] += row[j + 1]
                     row[j + 1] = 0
             # 再次更新每一行的0
             row = sorted(row, key=lambda x: 1 if x == 0 else 0)
             tmp_map[i] = row
 
-        prediction_score = calculate_evaluation(tmp_map)
-        if is_change:
-            self.map = copy.deepcopy(tmp_map)
-            self.score += single_score
-            return 0
-        else:
-            # return single_score + single_cnt * single_score + prediction_score * 0.8
-            return prediction_score
+        now_map = copy.deepcopy(tmp_map)       # 修改后的棋盘
+        if now_map != last_map:
+            is_ok = True
+        self.map = copy.deepcopy(now_map)
+        self.score += single_score
+        return is_ok
 
-    def move_right(self, is_change=True):
+    def move_right(self):
         self.map = [row[::-1] for row in self.map]
-        temp = self.move_left(is_change)
+        temp = self.move_left()
         self.map = [row[::-1] for row in self.map]
         return temp
 
-    def move_up(self, is_change=True):
+    def move_up(self):
         # 左旋90° 再 右旋90°
         self.map_left_rotate90()
-        temp = self.move_left(is_change)
+        temp = self.move_left()
         self.map_right_rotate90()
         return temp
 
-    def move_down(self, is_change=True):
+    def move_down(self):
         # 右旋90° 再 左旋90°
         self.map_right_rotate90()
-        temp = self.move_left(is_change)
+        temp = self.move_left()
         self.map_left_rotate90()
         return temp
-
-    def print_map(self):
-        print("当前局势为:")
-        for i in range(4):
-            print(self.map[i])
 
     def map_left_rotate90(self):
         """ 左旋转90° """
@@ -151,18 +144,35 @@ class Board(object):
                 temp_map[i][j] = self.map[3 - j][i]
         self.map = copy.deepcopy(temp_map)
 
+    def move(self, direction):
+        if direction == MOVE_LEFT:
+            return self.move_left()
+        elif direction == MOVE_UP:
+            return self.move_up()
+        elif direction == MOVE_RIGHT:
+            return self.move_right()
+        elif direction == MOVE_DOWM:
+            return self.move_down()
+
+    # TODO:tip_direction函数需要修改
     def tip_direction(self):
         """提示操作方向"""
 
         prediction = [0, 0, 0, 0]
-        prediction[0] = self.move_left(False)
-        prediction[1] = self.move_up(False)
-        prediction[2] = self.move_right(False)
-        prediction[3] = self.move_down(False)
+        # prediction[0] = self.move_left()
+        # prediction[1] = self.move_up()
+        # prediction[2] = self.move_right()
+        # prediction[3] = self.move_down()
         self.best_direction = prediction.index(max(prediction))
-        # print(tip[self.best_direction])
         return self.best_direction
 
+    def print_map(self):
+        print("当前局势为:")
+        print(tip[self.tip_direction()])
+        for i in range(4):
+            print(self.map[i])
+
+# TODO:还想加入一个显示当前在 常规2048 还是 AI2048 的界面
     def update(self, surface, is_tip):
         '''
         :param surface:

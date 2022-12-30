@@ -96,17 +96,24 @@ class Game2048(object):
             pass
 
     def __keyboard_handler(self, key):
-        """键盘处理"""
-
+        """键盘处理：常规2048游戏"""
+        direction = -1
         if key == pygame.K_DOWN or key == pygame.K_s:
-            self.board.move_down()
+            direction = MOVE_DOWM
         elif key == pygame.K_UP or key == pygame.K_w:
-            self.board.move_up()
+            direction = MOVE_UP
         elif key == pygame.K_LEFT or key == pygame.K_a:
-            self.board.move_left()
+            direction = MOVE_LEFT
         elif key == pygame.K_RIGHT or key == pygame.K_d:
-            self.board.move_right()
-        else:
+            direction = MOVE_RIGHT
+
+        if direction == -1:
+            print("按键错误，请使用正确的按键")
+            return None
+
+        is_move = self.board.move(direction)
+        if not is_move:
+            print(f"不能执行{CHAR_DIRECTION[direction]}动作，请重新操作")
             return None
 
         if self.board.add() == GAME_OVER:
@@ -115,7 +122,7 @@ class Game2048(object):
             self.screen.blit(text_end, (60, 350))
             pygame.display.update()
 
-            time.sleep(3)
+            time.sleep(2)
             self.board = Board()
         self.board.print_map()
         self.board.tip_direction()
@@ -139,16 +146,11 @@ class Game2048(object):
             else:
                 self.flag_tip = True
 
+# TODO:静态估计AI还存在可能操作不能执行的bug
     def AI_start(self):
+        '''AI功能'''
         best_direction = self.board.tip_direction()
-        if best_direction == 0:
-            self.board.move_left()
-        elif best_direction == 1:
-            self.board.move_up()
-        elif best_direction == 2:
-            self.board.move_right()
-        elif best_direction == 3:
-            self.board.move_down()
+        self.board.move(best_direction)
 
         self.best_score = max(self.best_score, self.board.score)
         print(" score:%d\n best_score:%d" % (self.board.score, self.best_score))
@@ -158,7 +160,7 @@ class Game2048(object):
             self.screen.blit(text_end, (60, 300))
             pygame.display.update()
 
-            time.sleep(3)
+            time.sleep(2)
             self.board = Board()
         self.board.print_map()
 

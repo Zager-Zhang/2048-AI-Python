@@ -38,3 +38,10 @@ BUTTON_START_X = 30
 BUTTON_START_Y = 120
 BUTTON_SIDE = 10
 BUTTON_SIZE = (90, 45)
+
+# 移动变量
+MOVE_LEFT = 0
+MOVE_UP = 1
+MOVE_RIGHT = 2
+MOVE_DOWM = 3
+CHAR_DIRECTION = ['left', 'up', 'right', 'down']

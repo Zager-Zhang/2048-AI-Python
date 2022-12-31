@@ -78,16 +78,17 @@ class Board(object):
         self.map[math.floor(pos // 4)][pos % 4] = num
         return GAME_CONTINUE
 
-    def move_left(self):
+    def move_left(self, is_change=True):
         """
-        function: 棋盘左移
-        return: False不能左移 True可以左移
+        :param is_change True->改变当前棋盘  False->只是为了判断能否执行该移动
+        :function: 棋盘左移
+        :return: False不能左移 True可以左移
         """
 
         single_score = 0
         is_ok = False
         tmp_map = copy.deepcopy(self.map)
-        last_map = copy.deepcopy(self.map)      # 修改前的棋盘
+        last_map = copy.deepcopy(self.map)  # 修改前的棋盘
         for i in range(4):
             row = tmp_map[i]
             # 将每一行的0都移到后面
@@ -101,30 +102,32 @@ class Board(object):
             row = sorted(row, key=lambda x: 1 if x == 0 else 0)
             tmp_map[i] = row
 
-        now_map = copy.deepcopy(tmp_map)       # 修改后的棋盘
+        now_map = copy.deepcopy(tmp_map)  # 修改后的棋盘
         if now_map != last_map:
             is_ok = True
-        self.map = copy.deepcopy(now_map)
+
+        if is_change:
+            self.map = copy.deepcopy(now_map)
         self.score += single_score
         return is_ok
 
-    def move_right(self):
+    def move_right(self, is_change=True):
         self.map = [row[::-1] for row in self.map]
-        temp = self.move_left()
+        temp = self.move_left(is_change)
         self.map = [row[::-1] for row in self.map]
         return temp
 
-    def move_up(self):
+    def move_up(self, is_change=True):
         # 左旋90° 再 右旋90°
         self.map_left_rotate90()
-        temp = self.move_left()
+        temp = self.move_left(is_change)
         self.map_right_rotate90()
         return temp
 
-    def move_down(self):
+    def move_down(self, is_change=True):
         # 右旋90° 再 左旋90°
         self.map_right_rotate90()
-        temp = self.move_left()
+        temp = self.move_left(is_change)
         self.map_left_rotate90()
         return temp
 
@@ -144,15 +147,15 @@ class Board(object):
                 temp_map[i][j] = self.map[3 - j][i]
         self.map = copy.deepcopy(temp_map)
 
-    def move(self, direction):
+    def move(self, direction, is_change=True):
         if direction == MOVE_LEFT:
-            return self.move_left()
+            return self.move_left(is_change)
         elif direction == MOVE_UP:
-            return self.move_up()
+            return self.move_up(is_change)
         elif direction == MOVE_RIGHT:
-            return self.move_right()
+            return self.move_right(is_change)
         elif direction == MOVE_DOWM:
-            return self.move_down()
+            return self.move_down(is_change)
 
     # TODO:tip_direction函数需要修改
     def tip_direction(self):
@@ -163,7 +166,15 @@ class Board(object):
         # prediction[1] = self.move_up()
         # prediction[2] = self.move_right()
         # prediction[3] = self.move_down()
-        self.best_direction = prediction.index(max(prediction))
+
+        # 循环寻找最大而且可移动的方向
+        for i in range(4):
+            direction = prediction.index(max(prediction))
+            if not self.move(direction, False):
+                prediction[direction] = -1
+            else:
+                self.best_direction = direction
+                break
         return self.best_direction
 
     def print_map(self):
@@ -172,7 +183,7 @@ class Board(object):
         for i in range(4):
             print(self.map[i])
 
-# TODO:还想加入一个显示当前在 常规2048 还是 AI2048 的界面
+    # TODO:还想加入一个显示当前在 常规2048 还是 AI2048 的界面
     def update(self, surface, is_tip):
         '''
         :param surface:

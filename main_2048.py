@@ -14,7 +14,7 @@ class Game2048(object):
         # 屏幕相关
         self.screen = pygame.display.set_mode(SCREEN_RECT.size, 0, 32)
         self.screen.fill((255, 250, 240), rect=SCREEN_RECT)
-        pygame.display.set_caption("2048——by 张明杰 鄢歆璐")
+        pygame.display.set_caption("2048——by 张明杰 鄢歆璐 梅阳鸿")
 
         # 字体相关
         self.font_EN = pygame.font.SysFont("comicsansms", 75)

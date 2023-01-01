@@ -1,5 +1,7 @@
+from board_2048 import *
 from button import *
-from board import *
+from config_2048 import *
+from ai_2048 import *
 import time
 
 
@@ -146,10 +148,11 @@ class Game2048(object):
             else:
                 self.flag_tip = True
 
-# TODO:静态估计AI还存在可能操作不能执行的bug
+    # TODO:静态估计AI还存在可能操作不能执行的bug
     def AI_start(self):
-        '''AI功能'''
-        best_direction = self.board.tip_direction()
+        """AI功能"""
+        best_direction = getBestMove(self.board, 5)
+        print(CHAR_DIRECTION[best_direction])
         self.board.move(best_direction)
 
         self.best_score = max(self.best_score, self.board.score)

@@ -2,7 +2,8 @@ import copy
 import random
 import math
 from config_2048 import *
-from calculator import *
+
+
 
 GAME_CONTINUE = 1
 GAME_ERROR = 0
@@ -19,17 +20,19 @@ class Board(object):
 
     def __init__(self, mapp=None):
         """棋盘初始化"""
-        if mapp is None:
-            self.map = [[0 for _ in range(4)] for _ in range(4)]
-        else:
-            self.map = mapp
+        self.map = [[0 for _ in range(4)] for _ in range(4)]
         self.score = 0
         self.best_direction = None
 
         # 开局先加入两个2
         self.add(True)
         self.add(True)
+
+        if mapp is not None:
+            self.map = mapp
         self.print_map()
+
+
 
     def __judge_add(self):
         """判断当前是否可以添加数"""
@@ -77,6 +80,25 @@ class Board(object):
             num = 2
         self.map[math.floor(pos // 4)][pos % 4] = num
         return GAME_CONTINUE
+
+    def add_xy(self, x, y, value):
+        if self.map[x][y] == 0:
+            self.map[x][y] = value
+            return True
+        else:
+            return False
+
+    def remove_xy(self, x, y):
+        self.map[x][y] = 0
+
+    def getFreeBlocks(self):
+        """返回所以空格子的位置(i,j)"""
+        FreeBlocks = []
+        for i in range(4):
+            for j in range(4):
+                if self.map[i][j] == 0:
+                    FreeBlocks.append([i, j])
+        return FreeBlocks
 
     def move_left(self, is_change=True):
         """
@@ -160,14 +182,8 @@ class Board(object):
     # TODO:tip_direction函数需要修改
     def tip_direction(self):
         """提示操作方向"""
-
-        prediction = [0, 0, 0, 0]
-        # prediction[0] = self.move_left()
-        # prediction[1] = self.move_up()
-        # prediction[2] = self.move_right()
-        # prediction[3] = self.move_down()
-
         # 循环寻找最大而且可移动的方向
+        prediction = [0, 0, 0, 0]
         for i in range(4):
             direction = prediction.index(max(prediction))
             if not self.move(direction, False):
@@ -178,10 +194,11 @@ class Board(object):
         return self.best_direction
 
     def print_map(self):
-        print("当前局势为:")
-        print(tip[self.tip_direction()])
-        for i in range(4):
-            print(self.map[i])
+        pass
+        # print("当前局势为:")
+        # print(tip[self.tip_direction()])
+        # for i in range(4):
+        #     print(self.map[i])
 
     # TODO:还想加入一个显示当前在 常规2048 还是 AI2048 的界面
     def update(self, surface, is_tip):

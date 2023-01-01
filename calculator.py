@@ -8,7 +8,7 @@ def calculate_evaluation(mapp):
     monoWeight = 1.3
 
     return emptyWeight * calculate_empty(mapp) + maxnumWeight * calculate_maxnum(
-        mapp) + smoothWeight * calculate_smoothness(mapp) + monoWeight *calculate_monotonicity(mapp)
+        mapp) + smoothWeight * calculate_smoothness(mapp) + monoWeight * calculate_monotonicity(mapp)
 
 
 def calculate_empty(mapp):
@@ -67,6 +67,31 @@ def calculate_monotonicity(mapp):
     return max(dir_score[0], dir_score[1]) + max(dir_score[2], dir_score[3])
 
 
+def calculate_islands(mapp):
+    """计算棋盘中连通块的个数代表 整个棋盘的分散度"""
+    islands = 0
+    marked = [[True for _ in range(4)] for _ in range(4)]
+    for i in range(4):
+        for j in range(4):
+            if mapp[i][j] != 0:
+                marked[i][j] = False
+    for i in range(4):
+        for j in range(4):
+            if mapp[i][j] != 0 and not marked[i][j]:
+                islands += 1
+                mark(mapp, i, j, mapp[i][j], marked)
+    return islands
+
+
+def mark(mapp, x, y, value, marked):
+    if 0 <= x <= 3 and 0 <= y <= 3 and mapp[x][y] != 0 and mapp[x][y] == value and not marked[x][y]:
+        marked[x][y] = True
+        mark(mapp, x, y + 1, value, marked)
+        mark(mapp, x, y - 1, value, marked)
+        mark(mapp, x + 1, y, value, marked)
+        mark(mapp, x - 1, y, value, marked)
+
+
 def calculate_predictions(mapp):
     """计算未来一步的预测得分情况"""
 
@@ -82,3 +107,11 @@ def calculate_predictions(mapp):
             elif i - 1 >= 0 and mapp[i][j] == mapp[i - 1][j]:
                 tmp += mapp[i][j]
     return tmp
+
+
+if __name__ == '__main__':
+    mapp = [[8, 4, 2, 0],
+            [4, 2, 2, 0],
+            [2, 0, 0, 0],
+            [0, 0, 0, 0]]
+    print(calculate_islands(mapp))

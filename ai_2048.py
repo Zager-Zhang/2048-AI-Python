@@ -44,7 +44,8 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
         score_2 = []
         score_4 = []
         worstSituation = []
-        freeBlocks = newBoard.getFreeBlocks()
+        freeBlocks1 = newBoard.getFreeBlocks()
+        freeBlocks = copy.deepcopy(freeBlocks1)
         for value in [2, 4]:
             for i in range(len(freeBlocks)):
                 if not newBoard.add_xy(freeBlocks[i][0], freeBlocks[i][1], value):
@@ -54,7 +55,6 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
                 if value == 4:
                     score_4.append(-calculate_smoothness(newBoard.map) + calculate_islands(newBoard.map))
                 newBoard.remove_xy(freeBlocks[i][0], freeBlocks[i][1])
-
         maxScore = max(max(score_2), max(score_4))
         for i in range(len(score_2)):
             if score_2[i] == maxScore:
@@ -65,7 +65,13 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
         for situation in worstSituation:
             newBoard2 = Board(this_board.map)
             if not newBoard2.add_xy(situation[0][0], situation[0][1], situation[1]):
-                print("BUG!!")
+                print("bug!!")
+                # print(f"freeBlocks: {freeBlocks}")
+                # print(f"newBoard2.map: {newBoard2.map}")
+                # print(f"this_board.map: {this_board.map}")
+                # print(situation)
+                # print(maxScore)
+                # input()
             positions += 1
             result = search_best(newBoard2, depth, alpha, bestScore, positions, cutoffs, True)
             positions = result.positions
@@ -82,6 +88,5 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
 
 
 def getBestMove(this_board, depth=4):
-    tmp = Board(this_board.map)
-    result = search_best(tmp, depth, -100000, 100000, 0, 0, True)
+    result = search_best(this_board, depth, -100000, 100000, 0, 0, True)
     return result.move

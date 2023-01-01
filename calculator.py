@@ -2,12 +2,12 @@ import math
 
 
 def calculate_evaluation(mapp):
-    emptyWeight = 2.7
+    emptyWeight = 20
     maxnumWeight = 1.0
-    smoothWeight = 0.1
-    monoWeight = 1.3
+    smoothWeight = 0.2
+    monoWeight = 1.0
 
-    return emptyWeight * calculate_empty(mapp) + maxnumWeight * calculate_maxnum(
+    return emptyWeight * math.log(calculate_empty(mapp)) + maxnumWeight * calculate_maxnum(
         mapp) + smoothWeight * calculate_smoothness(mapp) + monoWeight * calculate_monotonicity(mapp)
 
 
@@ -46,6 +46,7 @@ def calculate_smoothness(mapp):
 
 
 def calculate_monotonicity(mapp):
+    """单调性"""
     dir_score = [0, 0, 0, 0]
     for i in range(4):
         for j in range(4):
@@ -110,8 +111,8 @@ def calculate_predictions(mapp):
 
 
 if __name__ == '__main__':
-    mapp = [[8, 4, 2, 0],
-            [4, 2, 2, 0],
-            [2, 0, 0, 0],
+    mapp = [[4, 4, 2, 0],
+            [4, 4, 2, 0],
+            [2, 2, 2, 0],
             [0, 0, 0, 0]]
     print(calculate_islands(mapp))

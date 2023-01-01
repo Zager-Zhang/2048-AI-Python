@@ -1,4 +1,7 @@
 import pygame
+
+# 搜索深度
+DEPTH = 4
 # 屏幕大小的常量
 SCREEN_RECT = pygame.Rect(0, 0, 450, 630)
 # 屏幕刷新率

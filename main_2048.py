@@ -151,12 +151,14 @@ class Game2048(object):
     # TODO:静态估计AI还存在可能操作不能执行的bug
     def AI_start(self):
         """AI功能"""
-        best_direction = getBestMove(self.board, 5)
+        newboard = Board(self.board.map)
+        best_direction = getBestMove(newboard, DEPTH)
         print(CHAR_DIRECTION[best_direction])
-        self.board.move(best_direction)
+        is_ok = self.board.move(best_direction)
 
         self.best_score = max(self.best_score, self.board.score)
         print(" score:%d\n best_score:%d" % (self.board.score, self.best_score))
+
         if self.board.add() == GAME_OVER:
             font_end = pygame.font.SysFont("comicsansms", 60)
             text_end = font_end.render("Game Over!", True, (50, 50, 50))
@@ -165,7 +167,7 @@ class Game2048(object):
 
             time.sleep(2)
             self.board = Board()
-        self.board.print_map()
+        # self.board.print_map()
 
     @staticmethod
     def __game_over():

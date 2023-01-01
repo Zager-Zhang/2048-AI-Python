@@ -29,7 +29,8 @@ class Board(object):
         self.add(True)
 
         if mapp is not None:
-            self.map = mapp
+            self.map = [[mapp[i][j]
+                         for i in range(4)] for j in range(4)]
         self.print_map()
 
 

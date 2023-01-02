@@ -3,8 +3,6 @@ import random
 import math
 from config_2048 import *
 
-
-
 GAME_CONTINUE = 1
 GAME_ERROR = 0
 GAME_OVER = -1
@@ -32,8 +30,6 @@ class Board(object):
             self.map = [[mapp[i][j]
                          for i in range(4)] for j in range(4)]
         self.print_map()
-
-
 
     def __judge_add(self):
         """判断当前是否可以添加数"""
@@ -201,13 +197,13 @@ class Board(object):
         #     print(self.map[i])
 
     # TODO:还想加入一个显示当前在 常规2048 还是 AI2048 的界面
-    def update(self, surface, is_tip):
+    def update(self, surface, is_tip, bestscore, mode):
         '''
         :param surface:
         :param is_tip:
         :return:
         '''
-
+        mode_text = ["Classic", "Auto"]
         # 棋盘板的颜色
         surface.fill(BOARD_COLOR, rect=BOARD_RECD)
 
@@ -239,6 +235,27 @@ class Board(object):
                         text = font.render(str(self.map[i][j]), True, CUBE_NUM_COLORS[1])
                     font_rect = text.get_rect(center=cube_rect.center)
                     surface.blit(text, font_rect)
+
+        surface.fill((205, 170, 125), rect=pygame.Rect(230, 60, 95, 45))
+        font = pygame.font.SysFont("Microsoft Sans Serif", 25)
+        text = font.render(str(self.score), True, (245, 245, 220))
+        font_rect = text.get_rect(centerx=277, centery=82)
+        surface.blit(text, font_rect)
+
+        surface.fill((205, 170, 125), rect=pygame.Rect(335, 60, 95, 45))
+        font = pygame.font.SysFont("Microsoft Sans Serif", 25)
+        text = font.render(str(bestscore), True, (245, 245, 220))
+        font_rect = text.get_rect(centerx=382, centery=82)
+        surface.blit(text, font_rect)
+
+        surface.fill((255, 250, 240), rect=pygame.Rect(34, 105, 190, 28))
+        font = pygame.font.SysFont("consolas", 26)
+        text = font.render("Mode:", True, (205, 55, 0))
+        surface.blit(text, (35, 106))
+
+        font = pygame.font.SysFont("consolas", 26)
+        text = font.render(str(mode_text[mode]), True, (205, 112, 84))
+        surface.blit(text, (112, 106))
 
         if is_tip:
             font = pygame.font.SysFont("consolas", 36)

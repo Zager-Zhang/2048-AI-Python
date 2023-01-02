@@ -27,8 +27,6 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
                     result.score = calculate_evaluation(newBoard.map)
                 else:
                     result = search_best(newBoard, depth - 1, bestScore, beta, positions, cutoffs, False)
-                    if result.score > 9900:
-                        result.score -= 1
                     positions = result.positions
                     cutoffs = result.cutoffs
 

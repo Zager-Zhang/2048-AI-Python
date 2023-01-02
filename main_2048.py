@@ -17,9 +17,25 @@ class Game2048(object):
         pygame.display.set_caption("2048——by 张明杰 鄢歆璐 梅阳鸿")
 
         # 字体相关
-        self.font_EN = pygame.font.SysFont("comicsansms", 75)
+        self.font_EN = pygame.font.SysFont("comicsansms", 85)
         self.text_title = self.font_EN.render("2048", True, (119, 110, 101))
         self.screen.blit(self.text_title, (10, 0))
+
+        # 分数块相关
+        self.screen.fill((205, 170, 125), rect=SCORE_RECT)
+        self.font_EN = pygame.font.SysFont("consolas", 26)
+        self.text_title = self.font_EN.render("Score", True, (245, 245, 220))
+        self.screen.blit(self.text_title, (242, 32))
+
+        self.screen.fill((205, 170, 125), rect=BEST_RECT)
+        self.font_EN = pygame.font.SysFont("consolas", 26)
+        self.text_title = self.font_EN.render("Best", True, (245, 245, 220))
+        self.screen.blit(self.text_title, (353, 32))
+
+        # 模式相关
+        self.font_EN = pygame.font.SysFont("consolas", 26)
+        self.text_title = self.font_EN.render("Mode:", True, (0, 0, 0))
+        self.screen.blit(self.text_title, (35, 106))
 
         # 时钟相关
         self.time = pygame.time.Clock()
@@ -53,19 +69,20 @@ class Game2048(object):
         self.flag_tip = False
 
         # 创建新的棋局
-        mapp = [[2, 4, 8, 16],
-                [4096, 2048, 1024, 512],
-                [2, 4, 8, 16],
-                [4096, 2048, 1024, 512]]
+        mapp = [[2, 32, 2, 0],
+                [8, 4, 64, 0],
+                [2, 32, 128, 1024],
+                [4, 8, 256, 4096]]
         self.board = Board()
 
     def game_start(self):
         print("2048游戏开始...")
         while True:
+            flag = 0 if self.flag_classic else 1
             self.time.tick(FRAME_PER_SEC)
             self.__event_handler()
             self.__button_handler()
-            self.board.update(self.screen, self.flag_tip)
+            self.board.update(self.screen, self.flag_tip, self.best_score,flag)
             pygame.display.update()
 
     def __event_handler(self):
@@ -128,7 +145,6 @@ class Game2048(object):
             time.sleep(2)
             self.board = Board()
         self.board.print_map()
-        self.board.tip_direction()
 
     def __button_func_handler(self, button_func):
         """处理按钮功能"""
@@ -172,7 +188,6 @@ class Game2048(object):
         print("score:%d\n best_score:%d" % (self.board.score, self.best_score))
 
         if self.board.best_direction == -1:  # 无法移动说明游戏结束
-            self.board.add()
             font_end = pygame.font.SysFont("comicsansms", 60)
             text_end = font_end.render("Game Over!", True, (50, 50, 50))
             self.screen.blit(text_end, (60, 300))

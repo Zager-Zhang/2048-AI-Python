@@ -1,13 +1,18 @@
 import pygame
 
 # 搜索深度
-DEPTH = 2
+DEPTH = 3
 # 屏幕大小的常量
 SCREEN_RECT = pygame.Rect(0, 0, 450, 630)
+#
+SCORE_RECT = pygame.Rect(230, 25, 95, 80)
+#
+BEST_RECT = pygame.Rect(335, 25, 95, 80)
 # 屏幕刷新率
 FRAME_PER_SEC = 60
 # 方块中字体的大小
 CUBE_NUM_SIZE = 80
+
 
 # 常规颜色
 RED = (255, 0, 0)
@@ -38,7 +43,7 @@ BUTTON_COLOR = (143, 122, 102)
 BUTTON_FONT_COLOR = (255, 255, 255)
 BUTTON_FONT_SIZE = 24
 BUTTON_START_X = 30
-BUTTON_START_Y = 120
+BUTTON_START_Y = 140
 BUTTON_SIDE = 10
 BUTTON_SIZE = (90, 45)
 

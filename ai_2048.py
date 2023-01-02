@@ -1,5 +1,5 @@
 from calculator import *
-from board_2048 import *
+from board import *
 
 
 class AI2048Result(object):
@@ -66,12 +66,6 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
             newBoard2 = Board(this_board.map)
             if not newBoard2.add_xy(situation[0][0], situation[0][1], situation[1]):
                 print("bug!!")
-                # print(f"freeBlocks: {freeBlocks}")
-                # print(f"newBoard2.map: {newBoard2.map}")
-                # print(f"this_board.map: {this_board.map}")
-                # print(situation)
-                # print(maxScore)
-                # input()
             positions += 1
             result = search_best(newBoard2, depth, alpha, bestScore, positions, cutoffs, True)
             positions = result.positions
@@ -88,5 +82,5 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
 
 
 def getBestMove(this_board, depth=4):
-    result = search_best(this_board, depth, -100000, 100000, 0, 0, True)
+    result = search_best(this_board, depth, -1000000, 1000000, 0, 0, True)
     return result.move

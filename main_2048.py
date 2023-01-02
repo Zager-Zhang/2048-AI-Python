@@ -1,4 +1,4 @@
-from board_2048 import *
+from board import *
 from button import *
 from config_2048 import *
 from ai_2048 import *
@@ -53,6 +53,10 @@ class Game2048(object):
         self.flag_tip = False
 
         # 创建新的棋局
+        mapp = [[2, 4, 8, 16],
+                [4096, 2048, 1024, 512],
+                [2, 4, 8, 16],
+                [4096, 2048, 1024, 512]]
         self.board = Board()
 
     def game_start(self):
@@ -85,17 +89,14 @@ class Game2048(object):
 
     def __button_handler(self):
         """按钮处理"""
-
+        if self.flag_auto or self.flag_tip:
+            self.update_best_direction()
         if self.flag_start:
             self.flag_start = False
             print("新的游戏开始了...")
             self.board = Board()
-        elif self.flag_classic:
-            pass
         elif self.flag_auto:
             self.AI_start()
-        elif self.flag_tip:
-            pass
 
     def __keyboard_handler(self, key):
         """键盘处理：常规2048游戏"""
@@ -148,26 +149,40 @@ class Game2048(object):
             else:
                 self.flag_tip = True
 
+    def update_best_direction(self):
+        newboard = Board(self.board.map)
+
+        # 搜索深度随空格子数的减少而增大，可以兼顾速度和质量
+        depth = DEPTH
+        if 4 <= calculate_empty(newboard.map) <= 7:
+            depth = DEPTH + 1
+        elif calculate_empty(newboard.map) <= 3:
+            depth = DEPTH + 2
+        best_direction = getBestMove(newboard, depth)
+        self.board.best_direction = best_direction
+
     # TODO:静态估计AI还存在可能操作不能执行的bug
     def AI_start(self):
         """AI功能"""
-        newboard = Board(self.board.map)
-        best_direction = getBestMove(newboard, DEPTH)
-        print(CHAR_DIRECTION[best_direction])
-        is_ok = self.board.move(best_direction)
+
+        print(self.board.best_direction)
+        is_ok = self.board.move(self.board.best_direction)
 
         self.best_score = max(self.best_score, self.board.score)
-        print(" score:%d\n best_score:%d" % (self.board.score, self.best_score))
+        print("score:%d\n best_score:%d" % (self.board.score, self.best_score))
 
-        if self.board.add() == GAME_OVER:
+        if self.board.best_direction == -1:  # 无法移动说明游戏结束
+            self.board.add()
             font_end = pygame.font.SysFont("comicsansms", 60)
             text_end = font_end.render("Game Over!", True, (50, 50, 50))
             self.screen.blit(text_end, (60, 300))
             pygame.display.update()
+            self.flag_auto = False
+            self.flag_tip = False
 
             time.sleep(2)
-            self.board = Board()
-        # self.board.print_map()
+        else:
+            self.board.add()
 
     @staticmethod
     def __game_over():

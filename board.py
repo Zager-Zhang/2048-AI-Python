@@ -180,19 +180,18 @@ class Board(object):
         elif direction == MOVE_DOWM:
             return self.move_down(is_change)
 
-    # TODO:tip_direction函数需要修改
-    def tip_direction(self):
-        """提示操作方向"""
-        # 循环寻找最大而且可移动的方向
-        prediction = [0, 0, 0, 0]
-        for i in range(4):
-            direction = prediction.index(max(prediction))
-            if not self.move(direction, False):
-                prediction[direction] = -1
-            else:
-                self.best_direction = direction
-                break
-        return self.best_direction
+    # def tip_direction(self):
+    #     """提示操作方向"""
+    #     # 循环寻找最大而且可移动的方向
+    #     prediction = [0, 0, 0, 0]
+    #     for i in range(4):
+    #         direction = prediction.index(max(prediction))
+    #         if not self.move(direction, False):
+    #             prediction[direction] = -1
+    #         else:
+    #             self.best_direction = direction
+    #             break
+    #     return self.best_direction
 
     def print_map(self):
         pass
@@ -243,6 +242,6 @@ class Board(object):
 
         if is_tip:
             font = pygame.font.SysFont("consolas", 36)
-            text = font.render('tip:' + tip[self.tip_direction()], True, (100, 100, 10))
+            text = font.render('tip:' + tip[self.best_direction], True, (100, 100, 10))
             font_rect = text.get_rect(center=(225, 406))
             surface.blit(text, font_rect)

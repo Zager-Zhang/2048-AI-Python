@@ -72,11 +72,7 @@ class Game2048(object):
         self.flag_gameover = False
 
         # 创建新的棋局
-        mapp = [[2, 32, 2, 0],
-                [8, 4, 64, 0],
-                [2, 32, 128, 1024],
-                [4, 8, 256, 4096]]
-        self.board = Board(mapp)
+        self.board = Board()
 
     def game_start(self):
         print("2048游戏开始...")

@@ -73,7 +73,7 @@ class Game2048(object):
                 [8, 4, 64, 0],
                 [2, 32, 128, 1024],
                 [4, 8, 256, 4096]]
-        self.board = Board()
+        self.board = Board(mapp)
 
     def game_start(self):
         print("2048游戏开始...")
@@ -116,7 +116,7 @@ class Game2048(object):
             self.AI_start()
 
     def __keyboard_handler(self, key):
-        """键盘处理：常规2048游戏"""
+        """键盘处理：常规2048相关操作"""
         direction = -1
         if key == pygame.K_DOWN or key == pygame.K_s:
             direction = MOVE_DOWM
@@ -127,24 +127,22 @@ class Game2048(object):
         elif key == pygame.K_RIGHT or key == pygame.K_d:
             direction = MOVE_RIGHT
 
+        # 没有使用要求的按键操作
         if direction == -1:
             print("按键错误，请使用正确的按键")
             return None
 
+        # 执行移动操作，并用is_move记录是否成功移动
         is_move = self.board.move(direction)
+
+        # 加数时先判断是否还能继续游戏
+        if self.board.add() == GAME_OVER:
+            self.show_game_over()
+
+        # 可以继续游戏，但可能操作使其无法移动
         if not is_move:
             print(f"不能执行{CHAR_DIRECTION[direction]}动作，请重新操作")
             return None
-
-        if self.board.add() == GAME_OVER:
-            font_end = pygame.font.SysFont("comicsansms", 60)
-            text_end = font_end.render("Game Over!", True, (50, 50, 50))
-            self.screen.blit(text_end, (60, 350))
-            pygame.display.update()
-
-            time.sleep(2)
-            self.board = Board()
-        self.board.print_map()
 
     def __button_func_handler(self, button_func):
         """处理按钮功能"""
@@ -181,23 +179,24 @@ class Game2048(object):
     def AI_start(self):
         """AI功能"""
 
-        print(self.board.best_direction)
         is_ok = self.board.move(self.board.best_direction)
 
         self.best_score = max(self.best_score, self.board.score)
-        print("score:%d\n best_score:%d" % (self.board.score, self.best_score))
 
         if self.board.best_direction == -1:  # 无法移动说明游戏结束
-            font_end = pygame.font.SysFont("comicsansms", 60)
-            text_end = font_end.render("Game Over!", True, (50, 50, 50))
-            self.screen.blit(text_end, (60, 300))
-            pygame.display.update()
-            self.flag_auto = False
-            self.flag_tip = False
-
-            time.sleep(2)
+            self.show_game_over()
         else:
             self.board.add()
+
+    def show_game_over(self):
+        font_end = pygame.font.SysFont("comicsansms", 60)
+        text_end = font_end.render("Game Over!", True, (50, 50, 50))
+        self.screen.blit(text_end, (60, 300))
+        pygame.display.update()
+        self.flag_auto = False
+        self.flag_tip = False
+
+        time.sleep(2)
 
     @staticmethod
     def __game_over():

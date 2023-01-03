@@ -3,6 +3,7 @@ from button.button import *
 from AI.ai_2048 import *
 from audio import *
 import time
+from datastorage import *
 
 
 class Game2048(object):
@@ -65,6 +66,7 @@ class Game2048(object):
 
         # 最好分数
         self.best_score = 0
+        self.data = []
         self.flag_start = False
         self.flag_classic = True
         self.flag_auto = False
@@ -72,6 +74,10 @@ class Game2048(object):
         self.flag_gameover = False
 
         # 创建新的棋局
+        # mapp = [[2, 32, 2, 2],
+        #         [8, 4, 64, 32],
+        #         [2, 32, 128, 1024],
+        #         [4, 8, 256, 4096]]
         self.board = Board()
 
     def game_start(self):
@@ -167,8 +173,6 @@ class Game2048(object):
             self.flag_gameover = True
             return None
 
-
-
     def __button_func_handler(self, button_func):
         """处理按钮功能"""
 
@@ -215,7 +219,7 @@ class Game2048(object):
                     break
             if direction < 4:
                 best_direction = direction
-            else:   #各个方向都不行，那说明已经无力回天
+            else:  # 各个方向都不行，那说明已经无力回天
                 best_direction = -1
 
         self.board.best_direction = best_direction
@@ -232,6 +236,8 @@ class Game2048(object):
 
     def show_game_over(self):
         show_over_audio()
+        self.data.append([calculate_maxnum(self.board.map), self.best_score])
+        write_data(self.data)
         font_end = pygame.font.SysFont("comicsansms", 60)
         text_end = font_end.render("Game Over!", True, (50, 50, 50))
         self.screen.blit(text_end, (60, 300))
@@ -241,8 +247,14 @@ class Game2048(object):
 
         time.sleep(2)
 
+        # 自测使用
+        self.board = Board()
+        self.flag_auto = True
+        self.flag_classic = False
+
     @staticmethod
     def __game_over():
+        """关闭游戏"""
         print("2048游戏结束...")
         pygame.quit()
         exit()

@@ -20,27 +20,25 @@ class Board(object):
         """棋盘初始化"""
         self.map = [[0 for _ in range(4)] for _ in range(4)]
         self.score = 0
-        self.best_direction = None
+        self.best_direction = 0
 
         # 开局先加入两个2
         self.add(True)
         self.add(True)
 
         if mapp is not None:
-            self.map = [[mapp[i][j]
-                         for i in range(4)] for j in range(4)]
-        self.print_map()
+            self.map = [[mapp[i][j] for i in range(4)] for j in range(4)]
 
-    def __judge_add(self):
-        """判断当前是否可以添加数"""
+    # def __judge_add(self):
+    #     """判断当前是否可以添加数"""
+    #
+    #     for i in range(4):
+    #         for j in range(4):
+    #             if self.map[i][j] == 0:
+    #                 return True
+    #     return False
 
-        for i in range(4):
-            for j in range(4):
-                if self.map[i][j] == 0:
-                    return True
-        return False
-
-    def __judge_game(self):
+    def judge_game(self):
         """判断游戏是否可以继续：是否有空方块或者有可以合并的"""
 
         for i in range(4):
@@ -62,12 +60,7 @@ class Board(object):
         随机添加一个新数字
         :return: GAME_OVER GAME_ERROR GAME_CONTINUE
         """
-        if not self.__judge_game():
-            print("Game Over!")
-            return GAME_OVER
-        if not self.__judge_add():
-            print("操作失误，请重新操作")
-            return GAME_ERROR
+
         pos = random.randint(0, 15)
         while self.map[math.floor(pos // 4)][pos % 4] != 0:
             pos = random.randint(0, 15)
@@ -76,6 +69,11 @@ class Board(object):
         if is_start:
             num = 2
         self.map[math.floor(pos // 4)][pos % 4] = num
+
+        if not self.judge_game():
+            print("Game Over!")
+            return GAME_OVER
+
         return GAME_CONTINUE
 
     def add_xy(self, x, y, value):
@@ -85,7 +83,7 @@ class Board(object):
         else:
             return False
 
-    def remove_xy(self, x, y):
+    def remove_xy(self, x: int, y: int):
         self.map[x][y] = 0
 
     def getFreeBlocks(self):
@@ -99,7 +97,7 @@ class Board(object):
 
     def move_left(self, is_change=True):
         """
-        :param is_change True->改变当前棋盘  False->只是为了判断能否执行该移动
+        :param: is_change=True->改变当前棋盘  =False->只是为了判断能否执行该移动
         :function: 棋盘左移
         :return: False不能左移 True可以左移
         """
@@ -122,6 +120,8 @@ class Board(object):
             tmp_map[i] = row
 
         now_map = copy.deepcopy(tmp_map)  # 修改后的棋盘
+
+        # 移动后的棋盘与移动的棋盘不能一样，否则说明移动出现了问题
         if now_map != last_map:
             is_ok = True
 
@@ -176,25 +176,10 @@ class Board(object):
         elif direction == MOVE_DOWM:
             return self.move_down(is_change)
 
-    # def tip_direction(self):
-    #     """提示操作方向"""
-    #     # 循环寻找最大而且可移动的方向
-    #     prediction = [0, 0, 0, 0]
-    #     for i in range(4):
-    #         direction = prediction.index(max(prediction))
-    #         if not self.move(direction, False):
-    #             prediction[direction] = -1
-    #         else:
-    #             self.best_direction = direction
-    #             break
-    #     return self.best_direction
-
     def print_map(self):
-        pass
-        # print("当前局势为:")
-        # print(tip[self.tip_direction()])
-        # for i in range(4):
-        #     print(self.map[i])
+        print("当前局势为:")
+        for i in range(4):
+            print(self.map[i])
 
     # TODO:还想加入一个显示当前在 常规2048 还是 AI2048 的界面
     def update(self, surface, is_tip, bestscore, mode):

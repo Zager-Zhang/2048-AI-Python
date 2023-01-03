@@ -1,6 +1,6 @@
 import math
 
-# 10 1.0 0.5 1.0 -> 15000
+
 def calculate_evaluation(mapp):
     emptyWeight = 2.7
     maxnumWeight = 1.0
@@ -22,7 +22,7 @@ def calculate_empty(mapp):
 
 
 def calculate_maxnum(mapp):
-    """计算最大数：最大数越大说明局势越好"""
+    """计算最大数：最大数越大说明局势越好 -> 冒险 """
     maxnum = 0
     for i in range(4):
         for j in range(4):
@@ -51,62 +51,41 @@ def calculate_smoothness(mapp):
 
 def calculate_monotonicity(mapp):
     """单调性"""
-    # dir_score = [0, 0, 0, 0]
-    # for i in range(4):
-    #     for j in range(4):
-    #         if mapp[i][j] != 0:
-    #             now_value = math.log2(mapp[i][j])
-    #             if i + 1 <= 3 and mapp[i + 1][j] != 0:
-    #                 next_value = math.log2(mapp[i + 1][j])
-    #                 if now_value > next_value:
-    #                     dir_score[0] += now_value - next_value
-    #                 else:
-    #                     dir_score[1] += next_value - now_value
-    #
-    #             if j + 1 <= 3 and mapp[i][j + 1] != 0:
-    #                 next_value = math.log2(mapp[i][j + 1])
-    #                 if now_value > next_value:
-    #                     dir_score[2] += now_value - next_value
-    #                 else:
-    #                     dir_score[3] += next_value - now_value
-    # return max(dir_score[0], dir_score[1]) + max(dir_score[2], dir_score[3])
     totals = [0, 0, 0, 0]  # 四个方向的单调性评估
-    # up/down direction
-    # add
 
     for i in range(4):
         current = 0
-        next = current + 1
-        while next < 4:
-            while next < 4 and mapp[i][next] == 0:
-                next += 1
-            if next >= 4:
-                next -= 1
+        _next = current + 1
+        while _next < 4:
+            while _next < 4 and mapp[i][_next] == 0:
+                _next += 1
+            if _next >= 4:
+                _next -= 1
             currentValue = math.log2(mapp[i][current]) if mapp[i][current] != 0 else 0
-            nextValue = math.log2(mapp[i][next]) if mapp[i][next] != 0 else 0
+            nextValue = math.log2(mapp[i][_next]) if mapp[i][_next] != 0 else 0
             if currentValue > nextValue:
                 totals[0] += nextValue - currentValue
             else:
                 totals[1] += currentValue - nextValue
-            current = next
-            next += 1
+            current = _next
+            _next += 1
     for i in range(4):
         current = 0
-        next = current + 1
-        while next < 4:
-            while next < 4 and mapp[next][i] == 0:
-                next += 1
-            if next >= 4:
-                next -= 1
+        _next = current + 1
+        while _next < 4:
+            while _next < 4 and mapp[_next][i] == 0:
+                _next += 1
+            if _next >= 4:
+                _next -= 1
             currentValue = math.log2(
                 mapp[current][i]) if mapp[current][i] != 0 else 0
-            nextValue = math.log2(mapp[next][i]) if mapp[next][i] != 0 else 0
+            nextValue = math.log2(mapp[_next][i]) if mapp[_next][i] != 0 else 0
             if currentValue > nextValue:
                 totals[2] += nextValue - currentValue
             else:
                 totals[3] += currentValue - nextValue
-            current = next
-            next += 1
+            current = _next
+            _next += 1
     return max(totals[:2]) + max(totals[2:])
 
 

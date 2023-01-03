@@ -4,10 +4,12 @@ import pygame
 DEPTH = 3
 # 屏幕大小的常量
 SCREEN_RECT = pygame.Rect(0, 0, 450, 630)
-#
+# 当前分数块大小的常量
 SCORE_RECT = pygame.Rect(230, 25, 95, 80)
-#
+# 最好分数块大小的常量
 BEST_RECT = pygame.Rect(335, 25, 95, 80)
+
+
 # 屏幕刷新率
 FRAME_PER_SEC = 60
 # 方块中字体的大小

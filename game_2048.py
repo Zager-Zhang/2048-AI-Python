@@ -17,25 +17,25 @@ class Game2048(object):
         pygame.display.set_caption("2048——by 张明杰 鄢歆璐 梅阳鸿")
 
         # 字体相关
-        self.font_EN = pygame.font.SysFont("comicsansms", 85)
-        self.text_title = self.font_EN.render("2048", True, (119, 110, 101))
-        self.screen.blit(self.text_title, (10, 0))
+        font_EN = pygame.font.SysFont("comicsansms", 85)
+        text_title = font_EN.render("2048", True, (119, 110, 101))
+        self.screen.blit(text_title, (10, 0))
 
         # 分数块相关
         self.screen.fill((205, 170, 125), rect=SCORE_RECT)
-        self.font_EN = pygame.font.SysFont("consolas", 26)
-        self.text_title = self.font_EN.render("Score", True, (245, 245, 220))
-        self.screen.blit(self.text_title, (242, 32))
+        font_EN = pygame.font.SysFont("consolas", 26)
+        text_title = font_EN.render("Score", True, (245, 245, 220))
+        self.screen.blit(text_title, (242, 32))
 
         self.screen.fill((205, 170, 125), rect=BEST_RECT)
-        self.font_EN = pygame.font.SysFont("consolas", 26)
-        self.text_title = self.font_EN.render("Best", True, (245, 245, 220))
-        self.screen.blit(self.text_title, (353, 32))
+        font_EN = pygame.font.SysFont("consolas", 26)
+        text_title = font_EN.render("Best", True, (245, 245, 220))
+        self.screen.blit(text_title, (353, 32))
 
         # 模式相关
-        self.font_EN = pygame.font.SysFont("consolas", 26)
-        self.text_title = self.font_EN.render("Mode:", True, (0, 0, 0))
-        self.screen.blit(self.text_title, (35, 106))
+        font_EN = pygame.font.SysFont("consolas", 26)
+        text_title = font_EN.render("Mode:", True, (0, 0, 0))
+        self.screen.blit(text_title, (35, 106))
 
         # 时钟相关
         self.time = pygame.time.Clock()
@@ -67,32 +67,37 @@ class Game2048(object):
         self.flag_classic = True
         self.flag_auto = False
         self.flag_tip = False
+        self.flag_gameover = False
 
         # 创建新的棋局
         mapp = [[2, 32, 2, 0],
                 [8, 4, 64, 0],
                 [2, 32, 128, 1024],
                 [4, 8, 256, 4096]]
-        self.board = Board(mapp)
+        self.board = Board()
 
     def game_start(self):
         print("2048游戏开始...")
         while True:
-            flag = 0 if self.flag_classic else 1
+            mode = 0 if self.flag_classic else 1
+            self.best_score = max(self.best_score, self.board.score)
+
             self.time.tick(FRAME_PER_SEC)
             self.__event_handler()
-            self.__button_handler()
-            self.board.update(self.screen, self.flag_tip, self.best_score,flag)
+            self.board.update(self.screen, self.flag_tip, self.best_score, mode)
             pygame.display.update()
+            self.__flag_handler()
 
     def __event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.__game_over()
+
             # 处理键盘事件
             elif event.type == pygame.KEYDOWN:
-                if self.button_classic:
+                if self.flag_classic:
                     self.__keyboard_handler(event.key)
+
             # 处理按钮事件
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.button_start.check_event()
@@ -104,16 +109,22 @@ class Game2048(object):
                 self.button_tip.check_event()
                 self.__button_func_handler(self.button_tip.func_handler())
 
-    def __button_handler(self):
-        """按钮处理"""
+    def __flag_handler(self):
+        """标志位处理"""
         if self.flag_auto or self.flag_tip:
             self.update_best_direction()
+
         if self.flag_start:
             self.flag_start = False
             print("新的游戏开始了...")
             self.board = Board()
-        elif self.flag_auto:
+
+        if self.flag_auto:
             self.AI_start()
+
+        if self.flag_gameover:
+            self.flag_gameover = False
+            self.show_game_over()
 
     def __keyboard_handler(self, key):
         """键盘处理：常规2048相关操作"""
@@ -137,7 +148,7 @@ class Game2048(object):
 
         # 加数时先判断是否还能继续游戏
         if self.board.add() == GAME_OVER:
-            self.show_game_over()
+            self.flag_gameover = True
 
         # 可以继续游戏，但可能操作使其无法移动
         if not is_move:
@@ -181,8 +192,6 @@ class Game2048(object):
 
         is_ok = self.board.move(self.board.best_direction)
 
-        self.best_score = max(self.best_score, self.board.score)
-
         if self.board.best_direction == -1:  # 无法移动说明游戏结束
             self.show_game_over()
         else:
@@ -203,8 +212,3 @@ class Game2048(object):
         print("2048游戏结束...")
         pygame.quit()
         exit()
-
-
-if __name__ == '__main__':
-    game2048 = Game2048()
-    game2048.game_start()

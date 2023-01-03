@@ -1,4 +1,4 @@
-from calculator import *
+from AI.calculator import *
 from board import *
 
 

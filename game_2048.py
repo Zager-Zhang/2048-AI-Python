@@ -1,7 +1,6 @@
-from board import *
-from button import *
 from config_2048 import *
-from ai_2048 import *
+from button.button import *
+from AI.ai_2048 import *
 import time
 
 

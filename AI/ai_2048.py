@@ -50,8 +50,10 @@ def search_best(this_board: Board, depth, alpha, beta, positions, cutoffs, playe
                     print("Ai加数这边出现bug")
                 if value == 2:
                     score_2.append(-calculate_smoothness(newBoard.map) + calculate_islands(newBoard.map))
+                    # score_2.append(-calculate_evaluation(newBoard.map))
                 if value == 4:
                     score_4.append(-calculate_smoothness(newBoard.map) + calculate_islands(newBoard.map))
+                    # score_4.append(-calculate_evaluation(newBoard.map))
                 newBoard.remove_xy(freeBlocks[i][0], freeBlocks[i][1])
         maxScore = max(max(score_2), max(score_4))
         for i in range(len(score_2)):

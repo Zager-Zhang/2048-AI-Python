@@ -7,7 +7,7 @@ def calculate_evaluation(mapp):
     smoothWeight = 0.1
     monoWeight = 1.0
 
-    return emptyWeight * math.log(calculate_empty(mapp)) + maxnumWeight * calculate_maxnum(
+    return emptyWeight * math.log(calculate_empty(mapp)+1) + maxnumWeight * calculate_maxnum(
         mapp) + smoothWeight * calculate_smoothness(mapp) + monoWeight * calculate_monotonicity(mapp)
 
 

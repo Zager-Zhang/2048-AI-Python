@@ -1,6 +1,7 @@
 from config_2048 import *
 from button.button import *
 from AI.ai_2048 import *
+from audio import *
 import time
 
 
@@ -9,6 +10,8 @@ class Game2048(object):
     def __init__(self):
         print("2048游戏初始化...")
         pygame.init()
+
+        pygame.mixer.init()
 
         # 屏幕相关
         self.screen = pygame.display.set_mode(SCREEN_RECT.size, 0, 32)
@@ -73,7 +76,7 @@ class Game2048(object):
                 [8, 4, 64, 0],
                 [2, 32, 128, 1024],
                 [4, 8, 256, 4096]]
-        self.board = Board()
+        self.board = Board(mapp)
 
     def game_start(self):
         print("2048游戏开始...")
@@ -99,13 +102,20 @@ class Game2048(object):
 
             # 处理按钮事件
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.button_start.check_event()
+                if self.button_start.check_event():
+                    show_click_audio()
                 self.__button_func_handler(self.button_start.func_handler())
-                self.button_classic.check_event()
+
+                if self.button_classic.check_event():
+                    show_click_audio()
                 self.__button_func_handler(self.button_classic.func_handler())
-                self.button_auto.check_event()
+
+                if self.button_auto.check_event():
+                    show_click_audio()
                 self.__button_func_handler(self.button_auto.func_handler())
-                self.button_tip.check_event()
+
+                if self.button_tip.check_event():
+                    show_click_audio()
                 self.__button_func_handler(self.button_tip.func_handler())
 
     def __flag_handler(self):
@@ -139,20 +149,29 @@ class Game2048(object):
 
         # 没有使用要求的按键操作
         if direction == -1:
+            show_error_audio()
             print("按键错误，请使用正确的按键")
             return None
 
         # 执行移动操作，并用is_move记录是否成功移动
         is_move = self.board.move(direction)
 
-        # 加数时先判断是否还能继续游戏
-        if self.board.add() == GAME_OVER:
+        if not self.board.judge_game():
             self.flag_gameover = True
+            return None
 
         # 可以继续游戏，但可能操作使其无法移动
         if not is_move:
+            show_error_audio()
             print(f"不能执行{CHAR_DIRECTION[direction]}动作，请重新操作")
             return None
+
+        # 加数时先判断是否还能继续游戏
+        if self.board.add() == GAME_OVER:
+            self.flag_gameover = True
+            return None
+
+
 
     def __button_func_handler(self, button_func):
         """处理按钮功能"""
@@ -183,20 +202,40 @@ class Game2048(object):
         elif calculate_empty(newboard.map) <= 3:
             depth = DEPTH + 2
         best_direction = getBestMove(newboard, depth)
+
+        # 一直减小搜索深度看其是否可以搜到最优结果
+        while best_direction == -1:
+            depth -= 1
+            if depth == 0:
+                break
+            best_direction = getBestMove(newboard, depth)
+
+        # 搜索不到最优，再测试各个方向的可行性
+        if best_direction == -1:
+            direction = 0
+            while not self.board.move(direction):
+                direction += 1
+                if direction == 4:
+                    break
+            if direction < 4:
+                best_direction = direction
+            else:   #各个方向都不行，那说明已经无力回天
+                best_direction = -1
+
         self.board.best_direction = best_direction
 
     # TODO:静态估计AI还存在可能操作不能执行的bug
     def AI_start(self):
         """AI功能"""
 
-        is_ok = self.board.move(self.board.best_direction)
-
         if self.board.best_direction == -1:  # 无法移动说明游戏结束
-            self.show_game_over()
+            self.flag_gameover = True
         else:
+            is_ok = self.board.move(self.board.best_direction)
             self.board.add()
 
     def show_game_over(self):
+        show_over_audio()
         font_end = pygame.font.SysFont("comicsansms", 60)
         text_end = font_end.render("Game Over!", True, (50, 50, 50))
         self.screen.blit(text_end, (60, 300))

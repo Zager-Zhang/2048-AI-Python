@@ -36,6 +36,7 @@ class Button(object):
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             self.status = 1
+            return True
 
     def func_handler(self):
         """返回按钮的功能"""

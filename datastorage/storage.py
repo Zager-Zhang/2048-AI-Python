@@ -16,7 +16,7 @@ def write_data(data):
     dir_path = "./datastorage/gamedata"
     mkdir(dir_path)
 
-    with open(dir_path + "/data2048.csv", "w", newline='') as csvfile:
+    with open(dir_path + "/data2048new.csv", "w", newline='') as csvfile:
         writer = csv.writer(csvfile)
 
         writer.writerow(["id", "max_num", "score"])

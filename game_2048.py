@@ -72,6 +72,7 @@ class Game2048(object):
         self.flag_auto = False
         self.flag_tip = False
         self.flag_gameover = False
+        self.id = 0
 
         # 创建新的棋局
         # mapp = [[2, 32, 2, 2],
@@ -224,7 +225,6 @@ class Game2048(object):
 
         self.board.best_direction = best_direction
 
-    # TODO:静态估计AI还存在可能操作不能执行的bug
     def AI_start(self):
         """AI功能"""
 
@@ -236,7 +236,8 @@ class Game2048(object):
 
     def show_game_over(self):
         show_over_audio()
-        self.data.append([calculate_maxnum(self.board.map), self.best_score])
+        self.id += 1
+        self.data.append([self.id, calculate_maxnum(self.board.map), self.board.score])
         write_data(self.data)
         font_end = pygame.font.SysFont("comicsansms", 60)
         text_end = font_end.render("Game Over!", True, (50, 50, 50))
@@ -248,9 +249,9 @@ class Game2048(object):
         time.sleep(2)
 
         # 自测使用
-        self.board = Board()
-        self.flag_auto = True
-        self.flag_classic = False
+        # self.board = Board()
+        # self.flag_auto = True
+        # self.flag_classic = False
 
     @staticmethod
     def __game_over():

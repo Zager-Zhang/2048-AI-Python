@@ -29,15 +29,6 @@ class Board(object):
         if mapp is not None:
             self.map = [[mapp[i][j] for i in range(4)] for j in range(4)]
 
-    # def __judge_add(self):
-    #     """判断当前是否可以添加数"""
-    #
-    #     for i in range(4):
-    #         for j in range(4):
-    #             if self.map[i][j] == 0:
-    #                 return True
-    #     return False
-
     def judge_game(self):
         """判断游戏是否可以继续：是否有空方块或者有可以合并的"""
 
@@ -127,7 +118,7 @@ class Board(object):
 
         if is_change:
             self.map = copy.deepcopy(now_map)
-        self.score += single_score
+            self.score += single_score
         return is_ok
 
     def move_right(self, is_change=True):
@@ -181,13 +172,8 @@ class Board(object):
         for i in range(4):
             print(self.map[i])
 
-    # TODO:还想加入一个显示当前在 常规2048 还是 AI2048 的界面
     def update(self, surface, is_tip, bestscore, mode):
-        '''
-        :param surface:
-        :param is_tip:
-        :return:
-        '''
+        """更新棋盘界面"""
         mode_text = ["Classic", "Auto"]
         # 棋盘板的颜色
         surface.fill(BOARD_COLOR, rect=BOARD_RECD)

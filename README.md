@@ -4,7 +4,7 @@
 
 > 2048-AI：Minimax搜索并使用Alpha Beta剪枝进行优化
 
-![kszIP.png](../img/kszIP.png)
+![image](https://github.com/Zager-Zhang/2048-AI-Python/blob/master/images/%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84.png)
 
 ## 程序使用说明
 
@@ -34,4 +34,4 @@
 8192 -> 3%
 ```
 
-[![ksFut.png](../img/ksFut.png)](https://imgloc.com/i/ksFut)
+[![image](https://github.com/Zager-Zhang/2048-AI-Python/blob/master/images/%E7%BB%9F%E8%AE%A1%E6%95%B0%E6%8D%AE.png)]

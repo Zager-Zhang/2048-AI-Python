@@ -8,7 +8,7 @@ def data_processing(path):
     plt.rcParams["axes.unicode_minus"] = False
 
     step, maxnum, score = np.loadtxt(path, unpack=True, delimiter=',', skiprows=1)
-    dict = {'512': 0, '1024': 0, '2048': 0, '4096': 0, '8192': 0}
+    dict = {'1024': 0, '2048': 0, '4096': 0, '8192': 0}
     for x in maxnum:
         dict[str(int(x))] += 1
     last = 0

@@ -2,7 +2,7 @@ import math
 
 
 def calculate_evaluation(mapp):
-    emptyWeight = 2.8
+    emptyWeight = 2.7 + (math.log(17)-math.log(calculate_empty(mapp)+1)) * 0.1
     maxnumWeight = 1.0
     smoothWeight = 0.1
     monoWeight = 1.0

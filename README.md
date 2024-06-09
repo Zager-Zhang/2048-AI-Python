@@ -4,7 +4,7 @@
 
 > 2048-AI：Minimax搜索并使用Alpha Beta剪枝进行优化
 
-![kszIP.png](../img/kszIP.png)
+<img src="images/整体结构.png" alt="整体结构.png" style="zoom:80%;" />
 
 ## 程序使用说明
 
@@ -22,7 +22,6 @@
 
 6. 在游戏过程中，如果出现错误操作，则会出现提示音效
 
-
 ## AI性能
 
 > 共做了125次测试
@@ -34,4 +33,4 @@
 8192 -> 3%
 ```
 
-<img src="https://i.328888.xyz/2023/01/08/kTnjp.png" alt="kTnjp.png" border="0" />
+![统计数据.png](images/统计数据.png)
